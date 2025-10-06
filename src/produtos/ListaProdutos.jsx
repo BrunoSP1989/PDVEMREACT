@@ -19,7 +19,8 @@ function ListaProdutos({ produtos, onEditar, onDeletar }) {
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white">{produto.nome}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{produto.categoria}</p>
                 <div className="flex space-x-4 mt-2 text-sm">
-                  <p className="font-semibold text-gray-800 dark:text-white">R$ {produto.preco.toFixed(2)}</p>
+                  <p className="font-semibold text-gray-800 dark:text-white">Preço de venda: R$ {produto.preco.toFixed(2)}</p>
+                  <p className="font text-gray-800 dark:text-white"> Preço de Custo: R$ {produto.precoCusto.toFixed(2)}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 self-center">Estoque: {produto.estoque}</p>
                 </div>
               </div>

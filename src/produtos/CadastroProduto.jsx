@@ -6,6 +6,7 @@ function CadastroProduto({ onSalvar, categorias, produtoParaEditar, onCancelar }
     const [preco, setPreco] = useState('');
     const [estoque, setEstoque] = useState('');
     const [categoria, setCategoria] = useState(categorias[0]?.nome || '');
+    const [precoCusto, setPrecoCusto] = useState('');
 
     useEffect(() => {
         if (produtoParaEditar) {
@@ -13,9 +14,11 @@ function CadastroProduto({ onSalvar, categorias, produtoParaEditar, onCancelar }
             setPreco(produtoParaEditar.preco);
             setEstoque(produtoParaEditar.estoque);
             setCategoria(produtoParaEditar.categoria);
+            setPrecoCusto(produtoParaEditar.precoCusto);
         } else {
             setNome('');
             setPreco('');
+            setPrecoCusto('');
             setEstoque('');
             setCategoria(categorias[0]?.nome || '');
         }
@@ -23,7 +26,13 @@ function CadastroProduto({ onSalvar, categorias, produtoParaEditar, onCancelar }
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const produtoData = { nome, preco: parseFloat(preco), estoque: parseInt(estoque), categoria };
+        const produtoData = {
+            nome,
+            preco: parseFloat(preco),
+            estoque: parseInt(estoque),
+            precoCusto: parseFloat(precoCusto),
+            categoria
+        };
         onSalvar(produtoData);
     };
 
@@ -38,6 +47,7 @@ function CadastroProduto({ onSalvar, categorias, produtoParaEditar, onCancelar }
                 {/* Campos do formulário ... */}
                 <div><label htmlFor="nome" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome do Produto</label><input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} required className="w-full px-4 py-2 border rounded-md" /></div>
                 <div><label htmlFor="preco" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preço (R$)</label><input id="preco" type="number" step="0.01" value={preco} onChange={(e) => setPreco(e.target.value)} required className="w-full px-4 py-2 border rounded-md" /></div>
+                <div><label htmlFor="precoCusto" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preço de Custo (R$)</label><input id="precoCusto" type="number" step="0.01" value={precoCusto} onChange={(e) => setPrecoCusto(e.target.value)} required className="w-full px-4 py-2 border rounded-md" /></div>
                 <div><label htmlFor="estoque" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantidade em Estoque</label><input id="estoque" type="number" value={estoque} onChange={(e) => setEstoque(e.target.value)} required className="w-full px-4 py-2 border rounded-md" /></div>
                 <div><label htmlFor="categoria" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoria</label><select id="categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)} required className="w-full px-4 py-2 border rounded-md">{categorias.length === 0 ? (<option value="" disabled>Cadastre uma categoria</option>) : (categorias.map((cat) => (<option key={cat.id} value={cat.nome}>{cat.nome}</option>)))}</select></div>
 

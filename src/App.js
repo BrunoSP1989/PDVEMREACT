@@ -13,9 +13,9 @@ const VALORES_INICIAIS_CATEGORIAS = [
 function App() {
   const [view, setView] = useState('listarProdutos');
   const [produtos, setProdutos] = useState([
-    { id: 1, nome: 'Mouse Gamer', preco: 159.9, estoque: 30, categoria: 'Periféricos' },
-    { id: 2, nome: 'Monitor Ultrawide', preco: 1899.9, estoque: 15, categoria: 'Monitores' },
-    { id: 3, nome: 'Placa de Vídeo RTX', preco: 4500.0, estoque: 5, categoria: 'Hardware' },
+    { id: 1, nome: 'Mouse Gamer', preco: 159.9,precoCusto: 120, estoque: 30, categoria: 'Periféricos' },
+    { id: 2, nome: 'Monitor Ultrawide', preco: 1899.9, precoCusto: 120,estoque: 15, categoria: 'Monitores' },
+    { id: 3, nome: 'Placa de Vídeo RTX', preco: 4500.0, precoCusto: 120,estoque: 5, categoria: 'Hardware' },
   ]);
   const [categorias, setCategorias] = useState([]);
   const [produtoEmEdicao, setProdutoEmEdicao] = useState(null);
