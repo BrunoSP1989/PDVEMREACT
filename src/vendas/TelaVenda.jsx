@@ -63,17 +63,18 @@ function TelaVenda({ produtos, onFinalizarVenda }) {
     };
 
     const handleConfirmarPagamento = (formaDePagamento) => {
-        // A única alteração está aqui: adicionamos o 'id' ao recibo.
         const reciboData = {
             id: Date.now(),
             itens: [...carrinho],
             total: totalVenda,
             formaPagamento: formaDePagamento,
-            data: new Date(),
+            data: new Date().toISOString(), // Usar toISOString para um formato padronizado
         };
         setUltimaVenda(reciboData);
 
-        onFinalizarVenda(carrinho);
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Agora estamos enviando o objeto completo da venda para o App.js
+        onFinalizarVenda(reciboData);
 
         setCarrinho([]);
 

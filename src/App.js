@@ -1,24 +1,35 @@
 import { useState, useEffect } from 'react';
 
+// COMPONENTES DE PRODUTOS E CATEGORIAS
 import ListaProdutos from './produtos/ListaProdutos';
 import CadastroProduto from './produtos/CadastroProduto';
 import CadastroCategoria from './produtos/CadastroCategoria';
 import ListaCategorias from './produtos/ListaCategorias';
+
+// COMPONENTES DE VENDAS
 import TelaVenda from './vendas/TelaVenda.jsx';
+// --- 1. IMPORTAR O NOVO COMPONENTE ---
+import TelaVendasRegistradas from './vendas/TelaVendasRegistradas.jsx';
+
 
 const VALORES_INICIAIS_CATEGORIAS = [
   { id: 1, nome: 'Periféricos' }, { id: 2, nome: 'Monitores' }, { id: 3, nome: 'Hardware' },
 ];
 
 function App() {
-  const [view, setView] = useState('listarProdutos');
+  // O estado inicial da view agora é 'vendas' para uma melhor experiência inicial
+  const [view, setView] = useState('vendas');
   const [produtos, setProdutos] = useState([
-    { id: 1, nome: 'Mouse Gamer', preco: 159.9,precoCusto: 120, estoque: 30, categoria: 'Periféricos' },
-    { id: 2, nome: 'Monitor Ultrawide', preco: 1899.9, precoCusto: 120,estoque: 15, categoria: 'Monitores' },
-    { id: 3, nome: 'Placa de Vídeo RTX', preco: 4500.0, precoCusto: 120,estoque: 5, categoria: 'Hardware' },
+    { id: 1, nome: 'Mouse Gamer', preco: 159.9, precoCusto: 120, estoque: 30, categoria: 'Periféricos' },
+    { id: 2, nome: 'Monitor Ultrawide', preco: 1899.9, precoCusto: 120, estoque: 15, categoria: 'Monitores' },
+    { id: 3, nome: 'Placa de Vídeo RTX', preco: 4500.0, precoCusto: 120, estoque: 5, categoria: 'Hardware' },
   ]);
   const [categorias, setCategorias] = useState([]);
   const [produtoEmEdicao, setProdutoEmEdicao] = useState(null);
+
+  // --- 2. ADICIONAR ESTADO PARA O HISTÓRICO DE VENDAS ---
+  const [historicoVendas, setHistoricoVendas] = useState([]);
+
 
   // Efeitos para limpar edição e sincronizar categorias
   useEffect(() => {
@@ -36,17 +47,13 @@ function App() {
   const adicionarCategoriaNaLista = (novaCategoria) => setCategorias([...categorias, novaCategoria]);
   const removerCategoriaDaLista = (id) => setCategorias(categorias.filter(c => c.id !== id));
 
-  // ==========================================================
-  // LÓGICA DE PRODUTOS - FUNÇÕES PREENCHIDAS
-  // ==========================================================
+  // Lógica de Produtos
   const salvarProduto = (produtoData) => {
     if (produtoEmEdicao) {
-      // Atualiza o produto existente
       setProdutos(produtos.map(p =>
         p.id === produtoEmEdicao.id ? { ...produtoData, id: produtoEmEdicao.id } : p
       ));
     } else {
-      // Adiciona um novo produto com ID
       setProdutos([...produtos, { ...produtoData, id: Date.now() }]);
     }
     setView('listarProdutos');
@@ -68,10 +75,40 @@ function App() {
     setView('listarProdutos');
   };
 
-  // Lógica de Vendas
-  const handleFinalizarVenda = (carrinho) => {
+  // --- CORREÇÃO APLICADA AQUI ---
+  const handleFinalizarVenda = (dadosVenda) => {
+    let vendaCompleta;
+
+    // Verifica se a TelaVenda enviou o objeto completo ou apenas o carrinho.
+    // Isso torna a função mais robusta e corrige o erro 'toLocaleString'.
+    if (Array.isArray(dadosVenda)) {
+      // Se for apenas o carrinho, criamos um objeto de venda mais estruturado.
+      console.warn("Recebendo dados de venda incompletos. Criando um objeto de venda padronizado.");
+      vendaCompleta = {
+        id: Date.now(),
+        itens: dadosVenda,
+        total: dadosVenda.reduce((acc, item) => acc + item.preco * item.quantidade, 0),
+        data: new Date().toISOString()
+      };
+    } else {
+      // Se já for o objeto completo, apenas o usamos.
+      vendaCompleta = dadosVenda;
+    }
+
+    // Adiciona o objeto de venda, agora completo e padronizado, ao histórico.
+    setHistoricoVendas(prevHistorico => [vendaCompleta, ...prevHistorico]);
+
+    const itensVendidos = vendaCompleta.itens;
+
+    // Se, por algum motivo, os itens não puderem ser encontrados, interrompemos.
+    if (!itensVendidos) {
+      console.error("Não foi possível processar a venda. Itens não encontrados:", vendaCompleta);
+      return;
+    }
+
+    // Lógica para atualizar o estoque
     let produtosAtualizados = [...produtos];
-    carrinho.forEach(itemVendido => {
+    itensVendidos.forEach(itemVendido => {
       const indexProduto = produtosAtualizados.findIndex(p => p.id === itemVendido.id);
       if (indexProduto !== -1) {
         produtosAtualizados[indexProduto].estoque -= itemVendido.quantidade;
@@ -80,11 +117,16 @@ function App() {
     setProdutos(produtosAtualizados);
   };
 
+
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen w-full flex flex-col items-center p-4 space-y-8">
       <nav className="flex flex-wrap justify-center gap-2 md:space-x-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md">
-        <button onClick={() => setView('vendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'vendas' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
+        <button onClick={() => setView('vendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'vendas' ? 'bg-green-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
           Realizar Venda
+        </button>
+        {/* --- 4. ADICIONAR NOVO BOTÃO DE NAVEGAÇÃO --- */}
+        <button onClick={() => setView('historicoVendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'historicoVendas' ? 'bg-green-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
+          Histórico de Vendas
         </button>
         <button onClick={() => setView('listarProdutos')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'listarProdutos' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700'}`}>
           Listar Produtos
@@ -99,6 +141,9 @@ function App() {
 
       <main className="w-full max-w-7xl">
         {view === 'vendas' && <TelaVenda produtos={produtos} onFinalizarVenda={handleFinalizarVenda} />}
+        {/* --- 5. ADICIONAR RENDERIZAÇÃO CONDICIONAL PARA A NOVA TELA --- */}
+        {view === 'historicoVendas' && <TelaVendasRegistradas vendas={historicoVendas} />}
+
         {view === 'listarProdutos' && <ListaProdutos produtos={produtos} onEditar={editarProduto} onDeletar={deletarProduto} />}
         {view === 'cadastrarProduto' && <CadastroProduto onSalvar={salvarProduto} categorias={categorias} produtoParaEditar={produtoEmEdicao} onCancelar={cancelarEdicao} />}
         {view === 'cadastrarCategoria' && (
@@ -113,3 +158,4 @@ function App() {
 }
 
 export default App;
+
