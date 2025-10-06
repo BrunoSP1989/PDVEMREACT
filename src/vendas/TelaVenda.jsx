@@ -140,7 +140,7 @@ function TelaVenda({ produtos, onFinalizarVenda }) {
                                 <span className="text-gray-800 dark:text-white">TOTAL</span>
                                 <span className="text-green-500">R$ {totalVenda.toFixed(2)}</span>
                             </div>
-                            <button onClick={handleAbrirModalPagamento} className="mt-6 w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition-colors text-lg disabled:bg-gray-400 disabled:cursor-not-allowed" disabled={carrinho.length === 0}>
+                            <button onClick={handleAbrirModalPagamento} className="mt-6 w-full py-3 px-4 bg-green-500 hover:bg-green-700 text-white font-bold rounded-md transition-colors text-lg disabled:bg-gray-400 disabled:cursor-not-allowed" disabled={carrinho.length === 0}>
                                 Finalizar Venda
                             </button>
                         </div>

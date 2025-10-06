@@ -83,7 +83,7 @@ function App() {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen w-full flex flex-col items-center p-4 space-y-8">
       <nav className="flex flex-wrap justify-center gap-2 md:space-x-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md">
-        <button onClick={() => setView('vendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'vendas' ? 'bg-green-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
+        <button onClick={() => setView('vendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'vendas' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
           Realizar Venda
         </button>
         <button onClick={() => setView('listarProdutos')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'listarProdutos' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700'}`}>
