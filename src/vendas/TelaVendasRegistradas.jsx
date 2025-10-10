@@ -62,6 +62,10 @@ function TelaVendasRegistradas({ vendas }) {
 
     const handleGerarPDF = (e) => {
         e.preventDefault();
+        if (vendasFiltradas.length === 0) {
+            alert("Nenhuma venda encontrada para os filtros selecionados.");
+            return;
+        }
         setGerandoPDF(true);
         setTimeout(() => {
             const relatorioElement = document.getElementById('relatorio-para-pdf');
