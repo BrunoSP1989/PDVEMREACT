@@ -60,6 +60,12 @@ function TelaVendasRegistradas({ vendas }) {
         });
     }, [vendas, dataInicio, dataFim, filtroPagamento]);
 
+    // NOVO: Calcula o total das vendas filtradas de forma eficiente
+    const totalVendidoFiltrado = useMemo(() => {
+        return vendasFiltradas.reduce((total, venda) => total + venda.total, 0);
+    }, [vendasFiltradas]);
+
+
     const handleGerarPDF = (e) => {
         e.preventDefault();
         if (vendasFiltradas.length === 0) {
@@ -133,6 +139,16 @@ function TelaVendasRegistradas({ vendas }) {
                 <button type="button" onClick={limparFiltros} className="py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-md transition-colors">Limpar Filtros</button>
                 <button type="button" onClick={handleGerarPDF} className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors">Salvar em PDF</button>
             </div>
+
+            {/* NOVO: Bloco para exibir o total vendido no período selecionado */}
+            {vendasFiltradas.length > 0 && (
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6 text-right">
+                    <span className="text-xl font-bold text-gray-800 dark:text-white">
+                        Total Vendido no Período: {formatarMoeda(totalVendidoFiltrado)}
+                    </span>
+                </div>
+            )}
+
             <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
                 <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
@@ -186,6 +202,16 @@ function TelaVendasRegistradas({ vendas }) {
                             </tr>
                         )}
                     </tbody>
+                    {/* NOVO: Rodapé da tabela para exibir o total, garantindo alinhamento correto das colunas */}
+                    {vendasFiltradas.length > 0 && (
+                        <tfoot className="bg-gray-100 dark:bg-gray-700">
+                            <tr className="font-semibold text-gray-900 dark:text-white">
+                                <th scope="row" colSpan="3" className="px-6 py-3 text-right text-base">Total Geral</th>
+                                <td className="px-6 py-3 text-right text-base">{formatarMoeda(totalVendidoFiltrado)}</td>
+                                <td className="px-6 py-3"></td> {/* Célula vazia para alinhar com a coluna de Ações */}
+                            </tr>
+                        </tfoot>
+                    )}
                 </table>
             </div>
         </div>
