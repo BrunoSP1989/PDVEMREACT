@@ -150,7 +150,7 @@ function TelaVendasRegistradas({ vendas }) {
                 <button type="button" onClick={limparFiltros} className="py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-md transition-colors">Limpar Filtros</button>
                 <button type="button" onClick={handleGerarPDF} className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors">Salvar em PDF</button>
             </div>
-            
+
             {/* 2. EXIBIÇÃO DO RESUMO (NOVA PARTE) */}
             {vendasFiltradas.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6">
@@ -164,6 +164,11 @@ function TelaVendasRegistradas({ vendas }) {
                                 <span className="font-semibold">{formatarMoeda(total)}</span>
                             </li>
                         ))}
+                        <div className="flex justify-between items-center mt-5">
+                            <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-1">Total Vendido:</h2>
+                            <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-1">{formatarMoeda(totalVendidoFiltrado)}</h2>
+                        </div>
+
                     </ul>
                 </div>
             )}
