@@ -5,6 +5,7 @@ import ListaProdutos from './produtos/ListaProdutos';
 import CadastroProduto from './produtos/CadastroProduto';
 import CadastroCategoria from './produtos/CadastroCategoria';
 import ListaCategorias from './produtos/ListaCategorias';
+import CadastroCliente from './clientes/CadastroCliente';
 
 // COMPONENTES DE VENDAS
 import TelaVenda from './vendas/TelaVenda.jsx';
@@ -29,6 +30,12 @@ function App() {
 
   // --- 2. ADICIONAR ESTADO PARA O HISTÓRICO DE VENDAS ---
   const [historicoVendas, setHistoricoVendas] = useState([]);
+
+  const [clientes, setClientes] = useState([
+    // Cliente inicial de exemplo
+    { id: 1, nome: 'João da Silva', email: 'joao@example.com', telefone: '11987654321', endereco: 'Rua Principal, 10' }
+  ])
+  const [clienteEmEdicao, setClienteEmEdicao] = useState(null);
 
 
   // Efeitos para limpar edição e sincronizar categorias
@@ -73,6 +80,25 @@ function App() {
   const cancelarEdicao = () => {
     setProdutoEmEdicao(null);
     setView('listarProdutos');
+  };
+  const salvarCliente = (clienteData) => {
+    if (clienteEmEdicao) {
+      // Modo Edição: Mapeia e atualiza o cliente correto
+      setClientes(clientes.map(c =>
+        c.id === clienteEmEdicao.id ? { ...clienteData, id: clienteEmEdicao.id } : c
+      ));
+    } else {
+      // Modo Cadastro: Adiciona um novo cliente com um ID
+      setClientes([...clientes, { ...clienteData, id: Date.now() }]);
+    }
+    // Após salvar, volta para uma view de listagem ou principal
+    setView('vendas'); // Ou 'listarClientes' se você criar uma lista
+    setClienteEmEdicao(null); // Limpa o estado de edição
+  };
+
+  const cancelarEdicaoCliente = () => {
+    setClienteEmEdicao(null);
+    setView('vendas'); // Volta para a tela principal
   };
 
   // --- CORREÇÃO APLICADA AQUI ---
@@ -137,6 +163,10 @@ function App() {
         <button onClick={() => setView('cadastrarCategoria')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'cadastrarCategoria' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700'}`}>
           Cadastrar Categoria
         </button>
+        {/* ✨ NOVO: Botão de Cadastro de Cliente */}
+        <button onClick={() => setView('cadastrarCliente')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'cadastrarCliente' ? 'bg-purple-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-700'}`}>
+          Cadastrar Cliente
+        </button>
       </nav>
 
       <main className="w-full max-w-7xl">
@@ -151,6 +181,13 @@ function App() {
             <CadastroCategoria onCategoriaAdicionada={adicionarCategoriaNaLista} />
             <ListaCategorias categorias={categorias} onRemoverCategoria={removerCategoriaDaLista} />
           </div>
+        )}
+        {view === 'cadastrarCliente' && (
+          <CadastroCliente
+            onSalvar={salvarCliente}
+            clienteParaEditar={clienteEmEdicao}
+            onCancelar={cancelarEdicaoCliente}
+          />
         )}
       </main>
     </div>
