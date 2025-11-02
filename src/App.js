@@ -5,11 +5,13 @@ import ListaProdutos from './produtos/ListaProdutos';
 import CadastroProduto from './produtos/CadastroProduto';
 import CadastroCategoria from './produtos/CadastroCategoria';
 import ListaCategorias from './produtos/ListaCategorias';
+
+// COMPONENTES DE CLIENTES
 import CadastroCliente from './clientes/CadastroCliente';
+import ListaCliente from './clientes/ListaCliente'; // Importação do novo componente
 
 // COMPONENTES DE VENDAS
 import TelaVenda from './vendas/TelaVenda.jsx';
-// --- 1. IMPORTAR O NOVO COMPONENTE ---
 import TelaVendasRegistradas from './vendas/TelaVendasRegistradas.jsx';
 
 
@@ -28,7 +30,6 @@ function App() {
   const [categorias, setCategorias] = useState([]);
   const [produtoEmEdicao, setProdutoEmEdicao] = useState(null);
 
-  // --- 2. ADICIONAR ESTADO PARA O HISTÓRICO DE VENDAS ---
   const [historicoVendas, setHistoricoVendas] = useState([]);
 
   const [clientes, setClientes] = useState([
@@ -81,6 +82,11 @@ function App() {
     setProdutoEmEdicao(null);
     setView('listarProdutos');
   };
+
+  // ===================================
+  // ✨ LÓGICA DE CLIENTES INTEGRADA
+  // ===================================
+
   const salvarCliente = (clienteData) => {
     if (clienteEmEdicao) {
       // Modo Edição: Mapeia e atualiza o cliente correto
@@ -91,24 +97,36 @@ function App() {
       // Modo Cadastro: Adiciona um novo cliente com um ID
       setClientes([...clientes, { ...clienteData, id: Date.now() }]);
     }
-    // Após salvar, volta para uma view de listagem ou principal
-    setView('vendas'); // Ou 'listarClientes' se você criar uma lista
-    setClienteEmEdicao(null); // Limpa o estado de edição
+    // Redireciona para a lista de clientes após salvar/editar
+    setView('listarClientes');
+    setClienteEmEdicao(null);
+  };
+
+  const deletarCliente = (id) => {
+    if (window.confirm("Tem certeza que deseja deletar este cliente?")) {
+      // Usa filter() para criar um novo array sem o cliente com o ID especificado
+      setClientes(clientes.filter(c => c.id !== id));
+    }
+  };
+
+  const editarCliente = (cliente) => {
+    // Define o cliente a ser editado no estado
+    setClienteEmEdicao(cliente);
+    // Muda a view para o formulário de cadastro, que agora funcionará como edição
+    setView('cadastrarCliente');
   };
 
   const cancelarEdicaoCliente = () => {
     setClienteEmEdicao(null);
-    setView('vendas'); // Volta para a tela principal
+    // Volta para a tela de listagem de clientes
+    setView('listarClientes');
   };
 
-  // --- CORREÇÃO APLICADA AQUI ---
+  // Lógica de Vendas
   const handleFinalizarVenda = (dadosVenda) => {
     let vendaCompleta;
 
-    // Verifica se a TelaVenda enviou o objeto completo ou apenas o carrinho.
-    // Isso torna a função mais robusta e corrige o erro 'toLocaleString'.
     if (Array.isArray(dadosVenda)) {
-      // Se for apenas o carrinho, criamos um objeto de venda mais estruturado.
       console.warn("Recebendo dados de venda incompletos. Criando um objeto de venda padronizado.");
       vendaCompleta = {
         id: Date.now(),
@@ -117,16 +135,13 @@ function App() {
         data: new Date().toISOString()
       };
     } else {
-      // Se já for o objeto completo, apenas o usamos.
       vendaCompleta = dadosVenda;
     }
 
-    // Adiciona o objeto de venda, agora completo e padronizado, ao histórico.
     setHistoricoVendas(prevHistorico => [vendaCompleta, ...prevHistorico]);
 
     const itensVendidos = vendaCompleta.itens;
 
-    // Se, por algum motivo, os itens não puderem ser encontrados, interrompemos.
     if (!itensVendidos) {
       console.error("Não foi possível processar a venda. Itens não encontrados:", vendaCompleta);
       return;
@@ -150,7 +165,6 @@ function App() {
         <button onClick={() => setView('vendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'vendas' ? 'bg-green-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
           Realizar Venda
         </button>
-        {/* --- 4. ADICIONAR NOVO BOTÃO DE NAVEGAÇÃO --- */}
         <button onClick={() => setView('historicoVendas')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'historicoVendas' ? 'bg-green-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'}`}>
           Histórico de Vendas
         </button>
@@ -163,15 +177,18 @@ function App() {
         <button onClick={() => setView('cadastrarCategoria')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'cadastrarCategoria' ? 'bg-blue-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-700'}`}>
           Cadastrar Categoria
         </button>
-        {/* ✨ NOVO: Botão de Cadastro de Cliente */}
+        {/* Botões de Cliente */}
         <button onClick={() => setView('cadastrarCliente')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'cadastrarCliente' ? 'bg-purple-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-700'}`}>
           Cadastrar Cliente
+        </button>
+        {/* Botão de Listar Clientes (Padronizado para 'listarClientes') */}
+        <button onClick={() => setView('listarClientes')} className={`px-4 py-2 font-semibold rounded-md transition-colors duration-200 text-sm md:text-base ${view === 'listarClientes' ? 'bg-purple-500 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-700'}`}>
+          Listar Clientes
         </button>
       </nav>
 
       <main className="w-full max-w-7xl">
         {view === 'vendas' && <TelaVenda produtos={produtos} onFinalizarVenda={handleFinalizarVenda} />}
-        {/* --- 5. ADICIONAR RENDERIZAÇÃO CONDICIONAL PARA A NOVA TELA --- */}
         {view === 'historicoVendas' && <TelaVendasRegistradas vendas={historicoVendas} />}
 
         {view === 'listarProdutos' && <ListaProdutos produtos={produtos} onEditar={editarProduto} onDeletar={deletarProduto} />}
@@ -182,11 +199,22 @@ function App() {
             <ListaCategorias categorias={categorias} onRemoverCategoria={removerCategoriaDaLista} />
           </div>
         )}
+
+        {/* Visualização de Cadastro de Cliente */}
         {view === 'cadastrarCliente' && (
           <CadastroCliente
             onSalvar={salvarCliente}
             clienteParaEditar={clienteEmEdicao}
             onCancelar={cancelarEdicaoCliente}
+          />
+        )}
+
+        {/* Visualização de Lista de Clientes (Padronizado para 'listarClientes') */}
+        {view === 'listarClientes' && (
+          <ListaCliente
+            clientes={clientes}
+            onEditar={editarCliente}
+            onDeletar={deletarCliente}
           />
         )}
       </main>
@@ -195,4 +223,3 @@ function App() {
 }
 
 export default App;
-
